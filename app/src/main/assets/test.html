@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=UTF-8>
+</head>
+<body>
+<div>
+    立即获取
+    <p id="now"></p>
+</div>
+<div>
+    延迟获取
+    <p id="delay"></p>
+</div>
+<script>
+    setTimeout(function() {
+      document.querySelector('#delay').textContent = JSON.stringify(window.WgPackage || '')
+    }, 3000);
+      document.querySelector('#now').textContent = JSON.stringify(window.WgPackage || '')
+  </script>
+</body>
+</html>
+

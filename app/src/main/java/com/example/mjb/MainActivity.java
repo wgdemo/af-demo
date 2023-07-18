@@ -1,6 +1,5 @@
 package com.example.mjb;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -24,28 +23,25 @@ import org.greenrobot.eventbus.EventBus;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
     private WebView webView;
-    String loadUrl = "https://9955502.com";
-//     String loadUrl = "https://run.edlucky333.com/home/game?currency=BRL&languageCode=pt&cid=906445&gameCategoryId=0";
-//    String loadUrl = "https://9.zone/?cid=704069&languageCode=pt&type=2&currency=BRL&gtmId=G-L0FER2DBF4&&tiktokBaesCode=CI7V59JC77U8RIVTJSC0";
+    String loadUrl = "https://web-024.cg6.co";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (TextUtils.isEmpty(loadUrl)){
+        if (TextUtils.isEmpty(loadUrl)) {
             finish();
         }
         webView = new WebView(this);
         setSetting();
-        webView.setWebViewClient(new WebViewClient(){
+        webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                 super.onReceivedError(view, errorCode, description, failingUrl);
-                if (TextUtils.equals(failingUrl,loadUrl)){
+                if (TextUtils.equals(failingUrl, loadUrl)) {
                     view.post(new Runnable() {
                         @Override
                         public void run() {
@@ -53,13 +49,13 @@ public class MainActivity extends Activity {
                         }
                     });
                 }
-
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                String WgPackage = "javascript:window.WgPackage = {name:'"+getPackageName()+"', version:'"+getAppVersionName(MainActivity.this)+"'}";
+                String WgPackage = "javascript:window.WgPackage = {name:'" + getPackageName() + "', version:'"
+                        + getAppVersionName(MainActivity.this) + "'}";
                 webView.evaluateJavascript(WgPackage, new ValueCallback<String>() {
                     @Override
                     public void onReceiveValue(String value) {
@@ -67,10 +63,12 @@ public class MainActivity extends Activity {
                     }
                 });
             }
+
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                String WgPackage = "javascript:window.WgPackage = {name:'"+getPackageName()+"', version:'"+getAppVersionName(MainActivity.this)+"'}";
+                String WgPackage = "javascript:window.WgPackage = {name:'" + getPackageName() + "', version:'"
+                        + getAppVersionName(MainActivity.this) + "'}";
                 webView.evaluateJavascript(WgPackage, new ValueCallback<String>() {
                     @Override
                     public void onReceiveValue(String value) {
@@ -79,23 +77,22 @@ public class MainActivity extends Activity {
                 });
             }
         });
-        webView.addJavascriptInterface(new JsInterface() , "jsBridge");
+        webView.addJavascriptInterface(new JsInterface(), "jsBridge");
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
 
         webView.loadUrl(loadUrl);
         setContentView(webView);
-
+        AppsFlyerLibUtil.init(this);
 
     }
 
-    public  String getAppVersionName(Context context) {
+    public String getAppVersionName(Context context) {
         String appVersionName = "";
         try {
-            PackageInfo packageInfo = context.getApplicationContext()
-                    .getPackageManager()
+            PackageInfo packageInfo = context.getApplicationContext().getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0);
-                appVersionName = packageInfo.versionName;
+            appVersionName = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(TAG, e.getMessage());
         }
@@ -115,14 +112,14 @@ public class MainActivity extends Activity {
         setting.setGeolocationEnabled(true);
         setting.setUseWideViewPort(true);
         setting.setAppCacheEnabled(true);
-        setting.setUserAgentString(setting.getUserAgentString().replaceAll("; wv",""));
+        setting.setUserAgentString(setting.getUserAgentString().replaceAll("; wv", ""));
 
         // 视频播放需要使用
         int SDK_INT = Build.VERSION.SDK_INT;
         if (SDK_INT > 16) {
             setting.setMediaPlaybackRequiresUserGesture(false);
         }
-        setting.setSupportZoom(false);//支持缩放
+        setting.setSupportZoom(false);// 支持缩放
         EventBus.getDefault().post(new String());
         try {
             Class<?> clazz = setting.getClass();
@@ -130,12 +127,14 @@ public class MainActivity extends Activity {
             if (method != null) {
                 method.invoke(setting, true);
             }
-        } catch (IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalArgumentException | NoSuchMethodException | IllegalAccessException
+                | InvocationTargetException e) {
             e.printStackTrace();
         }
         webView.setDownloadListener(new DownloadListener() {
             @Override
-            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype,
+                    long contentLength) {
                 Intent intent = new Intent();
                 // 设置意图动作为打开浏览器
                 intent.setAction(Intent.ACTION_VIEW);
@@ -147,11 +146,12 @@ public class MainActivity extends Activity {
             }
         });
     }
+
     @Override
     public void onBackPressed() {
-        if (webView.canGoBack()){
+        if (webView.canGoBack()) {
             webView.goBack();
-        }else {
+        } else {
             super.onBackPressed();
         }
     }
@@ -160,11 +160,11 @@ public class MainActivity extends Activity {
         // Android 调用 Js 方法1 中的返回值
         @JavascriptInterface
         public void postMessage(String name, String data) {
-            Log.e(TAG, "name = "+name + "    data = "+data);
+            Log.e(TAG, "name = " + name + "    data = " + data);
             if (TextUtils.isEmpty(name) || TextUtils.isEmpty(data)) {
                 return;
             }
-            AppsFlyerLibUtil.event(MainActivity.this, name,data);
+            AppsFlyerLibUtil.event(MainActivity.this, name, data);
         }
     }
 
@@ -179,7 +179,7 @@ public class MainActivity extends Activity {
                 }
                 Log.e(TAG, "---------下分成功-----");
                 /**
-                 *   下分回调
+                 * 下分回调
                  */
                 webView.evaluateJavascript("javascript:window.closeGame()", new ValueCallback<String>() {
                     @Override

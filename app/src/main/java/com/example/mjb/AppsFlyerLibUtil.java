@@ -49,7 +49,7 @@ public class AppsFlyerLibUtil {
      */
     public static void init(Context context) {
         // app flay初始化
-        AppsFlyerLib.getInstance().start(context, "pYU6soGkxa54SFn2qJ2EQm", new AppsFlyerRequestListener() {
+        AppsFlyerLib.getInstance().start(context, "LKvp79owWxnwLM8Kfe4MxB", new AppsFlyerRequestListener() {
             @Override
             public void onSuccess() {
                 Log.e(TAG, "Launch sent successfully, got 200 response code from server");
@@ -75,30 +75,13 @@ public class AppsFlyerLibUtil {
             Intent intent = new Intent(context, WebActivity.class);
             intent.putExtra("url", data);
             context.startActivityForResult(intent, 1);
-        } else if ("firstrecharge".equals(name)) {
-            // 首充
+        } else if ("firstrecharge".equals(name) || "recharge".equals(name)) {
             try {
                 Map maps = (Map) JSON.parse(data);
                 for (Object map : maps.entrySet()) {
                     String key = ((Map.Entry) map).getKey().toString();
                     if ("amount".equals(key)) {
                         eventValue.put(AFInAppEventParameterName.REVENUE, ((Map.Entry) map).getValue());
-                    } else if ("currency".equals(key)) {
-                        eventValue.put(AFInAppEventParameterName.CURRENCY, ((Map.Entry) map).getValue());
-                    }
-                }
-            } catch (Exception e) {
-
-            }
-        } else if ("recharge".equals(name)) {
-            // 复充成功
-            try {
-                Map maps = (Map) JSON.parse(data);
-                for (Object map : maps.entrySet()) {
-                    String key = ((Map.Entry) map).getKey().toString();
-                    if ("amount".equals(key)) {
-                        eventValue.put(AFInAppEventParameterName.REVENUE, ((Map.Entry) map).getValue());
-
                     } else if ("currency".equals(key)) {
                         eventValue.put(AFInAppEventParameterName.CURRENCY, ((Map.Entry) map).getValue());
                     }

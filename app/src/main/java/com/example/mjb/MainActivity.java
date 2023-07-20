@@ -1,5 +1,7 @@
 package com.example.mjb;
 
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +16,7 @@ import android.util.Log;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -23,11 +26,19 @@ import org.greenrobot.eventbus.EventBus;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
     private WebView webView;
-    String loadUrl = "https://web-024.cg6.co";
+    String loadUrl = "web-024.cg6.co";
+
+    private ValueCallback<Uri> mUploadCallBack;
+    private ValueCallback<Uri[]> mUploadCallBackAboveL;
+    private final  int REQUEST_CODE_FILE_CHOOSER = 888;
+
+//     String loadUrl = "https://run.edlucky333.com/home/game?currency=BRL&languageCode=pt&cid=906445&gameCategoryId=0";
+//    String loadUrl = "https://9.zone/?cid=704069&languageCode=pt&type=2&currency=BRL&gtmId=G-L0FER2DBF4&&tiktokBaesCode=CI7V59JC77U8RIVTJSC0";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +98,7 @@ public class MainActivity extends Activity {
 
     }
 
+
     public String getAppVersionName(Context context) {
         String appVersionName = "";
         try {
@@ -145,8 +157,42 @@ public class MainActivity extends Activity {
                 startActivity(intent);
             }
         });
+        webView.setWebChromeClient(new WebChromeClient() {
+            // For Android 3.0+
+            public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType) {
+                MainActivity.this.mUploadCallBack = uploadMsg;
+                openFileChooseProcess();
+            }
+
+            // For Android < 3.0
+            public void openFileChooser(ValueCallback<Uri> uploadMsgs) {
+                MainActivity.this.mUploadCallBack = uploadMsgs;
+                openFileChooseProcess();
+            }
+
+            // For Android  > 4.1.1
+            public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+                MainActivity.this.mUploadCallBack = uploadMsg;
+                openFileChooseProcess();
+            }
+
+            // For Android  >= 5.0
+            public boolean onShowFileChooser(WebView webView,
+                                             ValueCallback<Uri[]> filePathCallback,
+                                             WebChromeClient.FileChooserParams fileChooserParams) {
+                MainActivity.this.mUploadCallBackAboveL = filePathCallback;
+                openFileChooseProcess();
+                return true;
+            }
+        });
     }
 
+    private void openFileChooseProcess() {
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("image/*");
+        startActivityForResult(Intent.createChooser(i, "Select Picture"), REQUEST_CODE_FILE_CHOOSER);
+    }
     @Override
     public void onBackPressed() {
         if (webView.canGoBack()) {
@@ -155,7 +201,6 @@ public class MainActivity extends Activity {
             super.onBackPressed();
         }
     }
-
     public class JsInterface {
         // Android 调用 Js 方法1 中的返回值
         @JavascriptInterface
@@ -171,8 +216,25 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == RESULT_OK) {
+        Log.e(TAG, "---------requestCode = "+requestCode+ "      resultCode = "+resultCode);
+        if (requestCode == this.REQUEST_CODE_FILE_CHOOSER) {
+            Uri result = data == null || resultCode != RESULT_OK ? null : data.getData();
+            if (result != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (mUploadCallBackAboveL != null) {
+                        mUploadCallBackAboveL.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                        mUploadCallBackAboveL = null;
+                        return;
+                    }
+                } else if (mUploadCallBack != null) {
+                    mUploadCallBack.onReceiveValue(result);
+                    mUploadCallBack = null;
+                    return;
+                }
+            }
+            clearUploadMessage();
+            return;
+        }else if (resultCode == RESULT_OK) {
             if (requestCode == 1) {
                 if (webView == null) {
                     return;
@@ -188,6 +250,16 @@ public class MainActivity extends Activity {
                     }
                 });
             }
+        }
+    }
+    private void clearUploadMessage() {
+        if (mUploadCallBackAboveL != null) {
+            mUploadCallBackAboveL.onReceiveValue(null);
+            mUploadCallBackAboveL = null;
+        }
+        if (mUploadCallBack != null) {
+            mUploadCallBack.onReceiveValue(null);
+            mUploadCallBack = null;
         }
     }
 }

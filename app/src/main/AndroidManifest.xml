@@ -20,6 +20,7 @@
         >
         <activity
             android:name="com.example.mjb.MainActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,9 +28,11 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.example.mjb.WebActivity" android:exported="true" android:launchMode="singleTop">
-        </activity>
+            <activity
+                android:name="com.example.mjb.WebActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+                android:exported="true" android:launchMode="singleTop">
+            </activity>
     </application>
 
 </manifest>

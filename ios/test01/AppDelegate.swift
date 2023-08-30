@@ -1,12 +1,15 @@
 import UIKit
 import CoreData
+import FirebaseCore
 import AppsFlyerLib
 import AppTrackingTransparency
+
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions:
     [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        FirebaseApp.configure()
         AppsFlyerLib.shared().appsFlyerDevKey = "Uue7RffFu9warvPDqiHZ7B"
         AppsFlyerLib.shared().appleAppID = "987637882"
         AppsFlyerLib.shared().waitForATTUserAuthorization(timeoutInterval: 60)
@@ -43,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-            if CourseManager.shared.isForcePortrait{
+            if BrushTrackManager.shared.isForceBrushTrackManager{
                 return .portrait
             }else{
                 return .all

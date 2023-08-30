@@ -7,9 +7,9 @@ class ViewController: UIViewController {
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        let kecVC = HYWebController(course: "https://web-032.tyf32.net")
+        let kecVC = HYWebController(BrushTrack: "https://web2023web.cg.vin")
     kecVC.modalPresentationStyle = .fullScreen
-        kecVC.courseBlock = { isYulai in
+        kecVC.BrushTrackDetailBlock = { isYulai in
             if (!isYulai) {
                 self.dismiss(animated: true)
             }
